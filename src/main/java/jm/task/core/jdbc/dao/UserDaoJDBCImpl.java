@@ -10,7 +10,14 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-
+//        CREATE TABLE `kata_schema_users`.`user` (
+//  `id` INT NOT NULL AUTO_INCREMENT,
+//  `name` VARCHAR(45) NOT NULL,
+//  `lastName` VARCHAR(45) NOT NULL,
+//  `age` INT(3) NULL,
+//                PRIMARY KEY (`id`))
+//        ENGINE = InnoDB
+//        DEFAULT CHARACTER SET = utf8;
     }
 
     public void dropUsersTable() {
