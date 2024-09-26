@@ -6,15 +6,22 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+//java.util.logging.ConsoleHandler
+
 
 public class UserDaoJDBCImpl implements UserDao {
+
+    final Logger logger = Logger.getLogger("UserDaoJDBCImpl.class");
+
     Connection connection = Util.getConnection();
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
-        String sql = "        CREATE TABLE `kata_schema_users`.`user` (\n" +
+        String sql = "        CREATE TABLE `user` (\n" +
                 "  `id` BIGINT(5) NOT NULL AUTO_INCREMENT,\n" +
                 "  `name` VARCHAR(45) NOT NULL,\n" +
                 " `lastName` VARCHAR(45) NOT NULL,\n" +
@@ -25,9 +32,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
         int exist = existTableUser();
         if (exist == 0) {
-            try (Statement statement = connection.createStatement()) {
-                statement.execute(sql);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.execute();
             } catch (SQLException e) {
+                logger.log(Level.WARNING,"Error create table" );
                 e.printStackTrace();
             }
         }
@@ -42,13 +50,14 @@ public class UserDaoJDBCImpl implements UserDao {
                 ") AS table_exists;";
 
         int exist = 0;
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sqlTableExist);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlTableExist)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 exist = resultSet.getInt(1);
             }
 
         } catch (SQLException e) {
+            logger.log(Level.WARNING,"Error IF EXIST " );
             e.printStackTrace();
         }
         return exist;
@@ -56,12 +65,12 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void dropUsersTable() {
 
-        String sql = "DROP TABLE `kata_schema_users`.`user`;";
+        String sql = "DROP TABLE `user`;";
 
         int exist = existTableUser();
         if (exist == 1) {
-            try (Statement statement = connection.createStatement()) {
-                statement.execute(sql);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.execute();
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -76,8 +85,10 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
-            System.out.println("User с именем " + name + " добавлен в базу данных");
+            logger.log(Level.INFO,"User с именем " + name + " добавлен в базу данных" );
+         //   System.out.println("User с именем " + name + " добавлен в базу данных");
         } catch (SQLException e) {
+            logger.log(Level.WARNING,"Error insert into user " );
             throw new RuntimeException(e);
         }
     }
@@ -88,6 +99,7 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
+            logger.log(Level.WARNING,"Error delete user " );
             throw new RuntimeException(e);
         }
     }
@@ -95,8 +107,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         String sql = "SELECT * FROM USER";
         List<User> usersList = new ArrayList<>();
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery(sql);
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("ID"));
@@ -104,10 +116,12 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(resultSet.getString("LASTNAME"));
                 user.setAge(resultSet.getByte("AGE"));
                 usersList.add(user);
-                System.out.println(user);
+                logger.log(Level.INFO, "All users = "+ user );
+               // System.out.println(user);
             }
             return usersList;
         } catch (SQLException e) {
+            logger.log(Level.WARNING,"Error getAllUsers " );
             e.printStackTrace();
         }
 
@@ -115,11 +129,12 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String sql = " TRUNCATE TABLE `kata_schema_users`.`user`;";
+        String sql = " TRUNCATE TABLE `user`;";
 
-        try (Statement statement = connection.createStatement()) {
-            statement.execute(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.execute(sql);
         } catch (SQLException e) {
+            logger.log(Level.WARNING,"Error truncate user " );
             e.printStackTrace();
         }
     }

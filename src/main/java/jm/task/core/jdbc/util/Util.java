@@ -13,11 +13,7 @@ public class Util {
 public static Connection getConnection(){
     try {
         Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-      //  Statement statement = connection.createStatement()){
-    //      statement.execute("INSERT INTO user( name, lastName, age) VALUES ('serg', 'sergio', 15 )");
-//        if (!connection.isClosed()) {
-//            System.out.println("We are connected!");
-//        }
+
         return connection;
     } catch (SQLException e) {
         System.out.println("there is no connection... Exception!");
