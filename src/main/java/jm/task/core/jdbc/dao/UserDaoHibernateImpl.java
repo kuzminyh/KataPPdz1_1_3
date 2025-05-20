@@ -13,6 +13,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     private static final Logger log = Logger.getLogger(UserDaoHibernateImpl.class.getName());
 
+
     public UserDaoHibernateImpl() {
         // TODO document why this constructor is empty
     }
